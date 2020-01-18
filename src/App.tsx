@@ -53,15 +53,33 @@ const App: React.FC = () => {
 
   const [status, setStatus] = React.useState(Status.Main);
   const [snippet, setSnippet] = React.useState('');
-  const [fade, setFade] = React.useState(true);
+  const [error, setError] = React.useState(false);
+  const [helperText, setHelperText] = React.useState('');
 
   const handleSnippetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSnippet(event.target.value);
   };
 
   const handleSearch = () => {
-    setStatus(Status.Results);
-    setFade(false);
+    if (validateRegex(snippet)) {
+      setStatus(Status.Results);
+      setError(false);
+      setHelperText('');
+    } else {
+      setError(true);
+      setHelperText('Incorrect Regular Expression');
+    }
+  };
+
+  const validateRegex = (text: string) => {
+    let isValid = true;
+    try {
+      new RegExp(text);
+    } catch(e) {
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   return (
@@ -92,12 +110,14 @@ const App: React.FC = () => {
         <div className="Landing">
           <Typography variant='h1'>Glance</Typography>       
           <TextField
+              error={error}
               className={classes.defaultSearchBar}
               label="Code Snippet"
               InputProps={{
                   startAdornment: <InputAdornment position="start">&lt;&gt;</InputAdornment>,
               }}
               variant="outlined"
+              helperText={helperText}
               onChange={handleSnippetChange}
           />
           <Fab className={classes.defaultSearchButton} variant="extended" onClick={handleSearch}> 
