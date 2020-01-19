@@ -71,9 +71,20 @@ const App: React.FC = () => {
         setError(false);
         setHelperText('');
 
-        axios.get(`https://glance3.azurewebsites.net/regex/.*${snippet}.*`).then(({data}) => {
+        let improvedSearch: string = snippet;
+
+        axios.get(`https://api.cognitive.microsoft.com/bing/v7.0/spellcheck/?text=${snippet}`,
+          { headers : { 'Ocp-Apim-Subscription-Key': 'a1c6c738ee304cd48a1d211390ef5dde'}}).then(({data}) => {
+            if (data.flaggedTokens.length > 0) {
+              const flaggedToken: string = data.flaggedTokens[0].token;
+              const suggestion: string = data.flaggedTokens[0].suggestions[0].suggestion;
+              improvedSearch = snippet.replace(flaggedToken, suggestion);
+            }
+        });
+
+        axios.get(`https://glance3.azurewebsites.net/regex/.*${improvedSearch}.*`).then(({data}) => {
           setResults(data);
-        })
+        });
       } else {
         setError(true);
         setHelperText('Incorrect Regular Expression');
