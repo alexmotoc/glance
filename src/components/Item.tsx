@@ -18,6 +18,7 @@ const useStyles = makeStyles({
         display: 'flex',
         alignItems: 'center',
         marginBottom: 15,
+        marginTop: 10
     },
     ownerName: {
         marginLeft: 10
@@ -27,31 +28,44 @@ const useStyles = makeStyles({
     }
   });
 
-export const Item: React.FunctionComponent<{}> = () => {
+export type ItemProps = {
+    repo_name: string;
+    file_link?: string;
+    username: string;
+    avatar?: string;
+    filename: string;
+    snippet: string;
+    language: string;
+    repo_link: string;
+};
+
+export const Item: React.FunctionComponent<ItemProps> = (props: ItemProps) => {
     const classes = useStyles();
 
     return (
         <Card className={classes.card} variant="outlined">
             <CardContent>
                 <Typography variant="h5" component="h2">
-                    Repository Name
+                    {props.repo_name}
                 </Typography>
                 <div className={classes.owner}>
-                    <Avatar>H</Avatar>
+                    <Avatar>{props.avatar}</Avatar>
                     <Typography className={classes.ownerName} variant="h6" component="h3">
-                        Owner
+                        {props.username}
                     </Typography>
                 </div>
-                <Typography>
-                    Filename
-                </Typography>
+                <a href={props.file_link}>
+                    <Typography>
+                        {props.filename}
+                    </Typography>
+                </a>
                 <SyntaxHighlighter className={classes.code} language="javascript" showLineNumbers={true}>
-                    console.log(item);
+                    {props.snippet}
                 </SyntaxHighlighter>
-                <Chip label="JavaScript"/>
+                <Chip label={props.language}/>
             </CardContent>
             <CardActions>
-                <Button size="small">Go To Repo</Button>
+                <Button href={props.repo_link} size="small">Go To Repo</Button>
             </CardActions>
       </Card>
     );
