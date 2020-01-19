@@ -9,6 +9,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 
 const theme = createMuiTheme({
@@ -56,6 +57,7 @@ const App: React.FC = () => {
 
   const [status, setStatus] = React.useState<Status>(Status.Main);
   const [snippet, setSnippet] = React.useState<string>('');
+  const [progress, setProgress] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
   const [helperText, setHelperText] = React.useState<string>('');
   const [results, setResults] = React.useState<ItemProps[]>([]);
@@ -67,6 +69,7 @@ const App: React.FC = () => {
   const handleSearch = () => {
     if (snippet) {
       if (validateRegex(snippet)) {
+        setProgress(true);
         setStatus(Status.Results);
         setError(false);
         setHelperText('');
@@ -84,7 +87,8 @@ const App: React.FC = () => {
 
         axios.get(`https://glance3.azurewebsites.net/regex/.*${improvedSearch}.*`).then(({data}) => {
           setResults(data);
-        });
+          setProgress(false);
+        });       
       } else {
         setError(true);
         setHelperText('Incorrect Regular Expression');
@@ -124,7 +128,8 @@ const App: React.FC = () => {
             </Fab>
           </div>
           <Typography className={classes.results} variant="h4" component="h2">Results</Typography>
-          <Typography variant="body1">{results.length === 0 ? 'No Results ' : results.length} Found</Typography>
+          {progress ? <CircularProgress/> : 
+            <Typography variant="body1">{results.length === 0 ? 'No Results ' : results.length} Found</Typography>}
           {results.map((item) => 
             <Item
               repo_name={item.repo_name}
